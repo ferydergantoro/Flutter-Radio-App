@@ -7,6 +7,7 @@ import 'package:radio_app/radio/radio.dart';
 import 'package:radio_app/radio/widgets/expandable.dart';
 import 'package:radio_app/radio/widgets/player.dart';
 import 'package:radio_app/radio/widgets/radio_card.dart';
+import 'package:loggy/loggy.dart';
 
 class RadioList extends StatefulWidget {
   const RadioList({super.key});
@@ -33,7 +34,7 @@ class _RadioListState extends State<RadioList> {
   void initState() {
     super.initState();
     _controller.addListener(moveOffset);
-    radioClass =  RadioClass();
+    radioClass = RadioClass();
     readJson();
   }
 
@@ -50,7 +51,8 @@ class _RadioListState extends State<RadioList> {
   }
 
   Future<void> readJson() async {
-    final String response = await rootBundle.loadString('assets/json/station.json');
+    final String response =
+        await rootBundle.loadString('assets/json/station.json');
     List<dynamic> data = json.decode(response);
 
     setState(() {
@@ -86,7 +88,7 @@ class _RadioListState extends State<RadioList> {
 
       stationList.asMap().forEach((index, items) {
         if (items == item) {
-          if(item['isPlay'] == true) {
+          if (item['isPlay'] == true) {
             stationList[index]['isPlay'] = false;
             radioClass.pause();
           } else {
@@ -116,7 +118,7 @@ class _RadioListState extends State<RadioList> {
   void checkStation() {
     stationList.asMap().forEach((index, items) {
       if (items == currentlyPlaying) {
-        if(currentlyPlaying['isPlay'] == true) {
+        if (currentlyPlaying['isPlay'] == true) {
           stationList[index]['isPlay'] = false;
           radioClass.pause();
         } else {
@@ -145,15 +147,19 @@ class _RadioListState extends State<RadioList> {
           slivers: <Widget>[
             const SliverAppBar(
               backgroundColor: Colors.black,
-              title: Text('Radio List', style: TextStyle(color: Colors.white)),
+              title: Text('الإذاعة التجريبية',
+                  style: TextStyle(color: Colors.white)),
               primary: true,
               pinned: true,
               centerTitle: true,
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16),
-                child: Text('Recently played', style: theme.textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.w600, color: Colors.white)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16),
+                child: Text('Recently played',
+                    style: theme.textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.w600, color: Colors.white)),
               ),
             ),
             SliverList(
@@ -161,10 +167,7 @@ class _RadioListState extends State<RadioList> {
                 (BuildContext context, int index) {
                   final item = stationList[index];
 
-                  return RadioCard(
-                    onTab: () => radioPlayer(item),
-                    item: item
-                  );
+                  return RadioCard(onTab: () => radioPlayer(item), item: item);
                 },
                 childCount: stationList.length,
               ),
@@ -176,20 +179,23 @@ class _RadioListState extends State<RadioList> {
             ),
           ],
         ),
-        onIsContractedCallback: () => print('contracted'),
-        onIsExtendedCallback: () => print('extended'),
+        onIsContractedCallback: () => logDebug('contracted'),
+        onIsExtendedCallback: () => logDebug('extended'),
         persistentContentHeight: 64,
-        expandableContent: isPlayCardVisible ? Player(
-          title: radioTitle,
-          listener: radioListener,
-          imageURL: radioImageURl,
-          percentageOpen: _percentageOpen,
-          onTab: () => isPlaying ? pause() : play(),
-          icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-          metadata: metadata,
-        ) : const SizedBox(),
+        expandableContent: isPlayCardVisible
+            ? Player(
+                title: radioTitle,
+                listener: radioListener,
+                imageURL: radioImageURl,
+                percentageOpen: _percentageOpen,
+                onTab: () => isPlaying ? pause() : play(),
+                icon:
+                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                metadata: metadata,
+              )
+            : const SizedBox(),
         onOffsetChanged: (offset, minOffset, maxOffset) {
-          if(isPlayCardVisible) {
+          if (isPlayCardVisible) {
             if (maxOffset == null || offset == null || minOffset == null) {
               return;
             }
